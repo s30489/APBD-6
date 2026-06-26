@@ -1,6 +1,8 @@
 ﻿namespace APBD_6.Services;
 
-public class ServiceResult
+public enum ResultStatus { Ok, NotFound, BadRequest, Conflict, Created }
+
+public class ServiceResult<T>
 {
     
 }
