@@ -19,4 +19,13 @@ public class AppointmentsController : ControllerBase
         var items = await _service.GetAllAsync(status, patientLastName);
         return Ok(items);
     }
+    
+    [HttpGet("{idAppointment:int}")]
+    public async Task<IActionResult> GetById(int idAppointment)
+    {
+        var result = await _service.GetByIdAsync(idAppointment);
+        return result.Status == ResultStatus.NotFound
+            ? NotFound(new ErrorResponseDto(result.Error!))
+            : Ok(result.Value);
+    }
 }
