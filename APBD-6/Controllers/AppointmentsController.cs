@@ -44,4 +44,18 @@ public class AppointmentsController : ControllerBase
             _ => StatusCode(500)
         };
     }
+    [HttpPut("{idAppointment:int}")]
+    public async Task<IActionResult> Update(
+        int idAppointment, [FromBody] UpdateAppointmentRequestDto dto)
+    {
+        var result = await _service.UpdateAsync(idAppointment, dto);
+        return result.Status switch
+        {
+            ResultStatus.Ok => Ok(),
+            ResultStatus.NotFound => NotFound(new ErrorResponseDto(result.Error!)),
+            ResultStatus.BadRequest => BadRequest(new ErrorResponseDto(result.Error!)),
+            ResultStatus.Conflict => Conflict(new ErrorResponseDto(result.Error!)),
+            _ => StatusCode(500)
+        };
+    }
 }
