@@ -58,4 +58,17 @@ public class AppointmentsController : ControllerBase
             _ => StatusCode(500)
         };
     }
+    
+    [HttpDelete("{idAppointment:int}")]
+    public async Task<IActionResult> Delete(int idAppointment)
+    {
+        var result = await _service.DeleteAsync(idAppointment);
+        return result.Status switch
+        {
+            ResultStatus.Ok => NoContent(),
+            ResultStatus.NotFound => NotFound(new ErrorResponseDto(result.Error!)),
+            ResultStatus.Conflict => Conflict(new ErrorResponseDto(result.Error!)),
+            _ => StatusCode(500)
+        };
+    }
 }

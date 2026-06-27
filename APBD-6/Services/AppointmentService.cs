@@ -190,6 +190,25 @@ public class AppointmentService
     await command.ExecuteNonQueryAsync();
     return ServiceResult<bool>.Ok(true);
 }
+    public async Task<ServiceResult<bool>> DeleteAsync(int idAppointment)
+    {
+        await using var connection = new SqlConnection(_connectionString);
+        await connection.OpenAsync();
+        
+        var current = await GetStatusAndDateAsync(connection, idAppointment);
+        if (current is null)
+            return ServiceResult<bool>.NotFound($"Appointment {idAppointment} not found.");
+        
+        if (current.Value.Status == "Completed")
+            return ServiceResult<bool>.Conflict("Cannot delete a completed appointment.");
+        
+        await using var command = new SqlCommand(
+            "DELETE FROM dbo.Appointments WHERE IdAppointment = @IdAppointment;", connection);
+        command.Parameters.Add("@IdAppointment", SqlDbType.Int).Value = idAppointment;
+
+        await command.ExecuteNonQueryAsync();
+        return ServiceResult<bool>.Ok(true);
+    }
     private static async Task<bool> PatientExistsAndActiveAsync(SqlConnection conn, int idPatient)
     {
         await using var cmd = new SqlCommand(
