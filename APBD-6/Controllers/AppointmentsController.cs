@@ -28,4 +28,20 @@ public class AppointmentsController : ControllerBase
             ? NotFound(new ErrorResponseDto(result.Error!))
             : Ok(result.Value);
     }
+    
+    [HttpPost]
+    public async Task<IActionResult> Create([FromBody] CreateAppointmentRequestDto dto)
+    {
+        var result = await _service.CreateAsync(dto);
+        return result.Status switch
+        {
+            ResultStatus.Created => CreatedAtAction(
+                nameof(GetById),
+                new { idAppointment = result.Value },
+                new { idAppointment = result.Value }),
+            ResultStatus.BadRequest => BadRequest(new ErrorResponseDto(result.Error!)),
+            ResultStatus.Conflict => Conflict(new ErrorResponseDto(result.Error!)),
+            _ => StatusCode(500)
+        };
+    }
 }
